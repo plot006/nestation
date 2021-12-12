@@ -27,3 +27,4 @@ yarn-error.log*
 
 # app
 public/rom.nes
+workspace.code-workspace
