@@ -90,5 +90,8 @@ export default class Emulator extends Component {
 		// DEBUG
 		window.emulator = this;
 		window.jsnes = jsnes;
+
+		// CLIP OFF.
+		this.nes.ppu.clipToTvSize = false;
 	}
 }
