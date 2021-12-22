@@ -13,6 +13,7 @@ import bus from "../events";
 import styles from "./PlayScreen.module.css";
 import strings from "../locales";
 import classNames from "classnames";
+import quarto from "../assets/quarto.nes";
 import _ from "lodash";
 
 // DEBUG
@@ -88,6 +89,7 @@ export default class PlayScreen extends Component {
 		window.addEventListener("dragover", this._ignore);
 		window.addEventListener("dragenter", this._ignore);
 		window.addEventListener("drop", this._onFileDrop);
+		window.addEventListener("DOMContentLoaded", this._onInitLoad);
 		if (config.options.crt)
 			document.querySelector("#container").classList.add("crt");
 	}
@@ -96,6 +98,7 @@ export default class PlayScreen extends Component {
 		window.removeEventListener("dragover", this._ignore);
 		window.removeEventListener("dragenter", this._ignore);
 		window.removeEventListener("drop", this._onFileDrop);
+		window.addEventListener("DOMContentLoaded", this._onInitLoad);
 	}
 
 	_onSyncer = (syncer) => {
@@ -117,6 +120,16 @@ export default class PlayScreen extends Component {
 			if (start) this.emulator.start();
 		});
 	}
+
+	_onInitLoad = (e) => {
+		loadBinary(quarto, (err, data) => {
+			if (err) {
+				this.setState({ error: `Error loading ROM: ${err.message}` });
+			} else {
+				this._loadRom(string_to_buffer(data));
+			}
+		});
+	};
 
 	_onFileDrop = (e) => {
 		e.preventDefault();
@@ -154,4 +167,38 @@ export default class PlayScreen extends Component {
 		helpers.cleanQueryString();
 		window.location.href = "#/";
 	};
+}
+
+export function loadBinary(path, callback, handleProgress) {
+	var req = new XMLHttpRequest();
+	req.open("GET", path);
+	req.overrideMimeType("text/plain; charset=x-user-defined");
+	req.onload = function() {
+		if (this.status === 200) {
+			if (req.responseText.match(/^<!doctype html>/i)) {
+				// Got HTML back, so it is probably falling back to index.html due to 404
+				return callback(new Error("Page not found"));
+			}
+
+			callback(null, this.responseText);
+		} else if (this.status === 0) {
+			// Aborted, so ignore error
+		} else {
+			callback(new Error(req.statusText));
+		}
+	};
+	req.onerror = function() {
+		callback(new Error(req.statusText));
+	};
+	req.onprogress = handleProgress;
+	req.send();
+	return req;
+}
+
+function string_to_buffer(src) {
+	return new Uint8Array(
+		[].map.call(src, function(c) {
+			return c.charCodeAt(0);
+		})
+	).buffer;
 }
