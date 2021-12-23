@@ -4,9 +4,23 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "terminate-react-start",
-			"command": "${input:terminate}",
+			"label": "react-start",
+			"command": "npm start",
 			"type": "shell",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "deploy",
+			"command": "npm run deploy",
+			"type": "shell",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
 			"problemMatcher": []
 		}
 	]

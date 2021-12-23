@@ -2,11 +2,9 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"type": "chrome",
+			"name": "debug",
 			"request": "launch",
-			"preLaunchTask": "npm: start",
-			"postDebugTask": "terminate-react-start",
-			"name": "Launch Chrome against localhost",
+			"type": "pwa-chrome",
 			"url": "http://localhost:3000",
 			"webRoot": "${workspaceFolder}"
 		}
